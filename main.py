@@ -53,7 +53,7 @@ def read_root():
 @app.get("/pd")
 def read_root():
     pr.rainfall()
-    time.sleep(10)
+    # time.sleep(10)
     df = pd.read_csv('kerala_rainfall.csv')
     print(df.to_string())
     return {"data": df.to_json(orient="records")}
