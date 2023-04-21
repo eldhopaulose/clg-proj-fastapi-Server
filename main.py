@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import prediction as pr
 import weather as wr
 import pandas as pd
-import requests
+import data as da
 import time
 
 app = FastAPI()
@@ -31,31 +31,24 @@ app.add_middleware(
 def read_root():
     df = pd.read_csv('aws.csv')
     print(df.to_string())
+    da.getData()
     return {"filename": df.to_json()}
 
 @app.get("/data")
 def read_root():
-    # Send GET request to API endpoint
-    url = "https://nodeumcu-clientserver.onrender.com/api/data"
-    response = requests.get(url)
-
-# Convert JSON response to DataFrame
-    data = response.json() 
-    df = pd.DataFrame(data)
-
-# Append DataFrame to CSV file
-    df.to_csv("data.csv", mode='a', header=False, index=False)
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('sensor_data.csv')
     print(df.to_string())
+    da.getData()
     return {"data": df.to_json(orient="records")}
 
 
 @app.get("/pd")
 def read_root():
     pr.rainfall()
-    # time.sleep(10)
+    time.sleep(10)
     df = pd.read_csv('kerala_rainfall.csv')
     print(df.to_string())
+    da.getData()
     return {"data": df.to_json(orient="records")}
 
 

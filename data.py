@@ -1,29 +1,31 @@
-# import requests
-# import pandas as pd
-
-# # Send GET request to API endpoint
-# url = "https://nodeumcu-clientserver.onrender.com/api/data"
-# response = requests.get(url)
-
-# # Convert JSON response to DataFrame
-# data = response.json()
-# df = pd.DataFrame(data)
-
-# # Save DataFrame to CSV file
-# df.to_csv("data.csv", index=False)
-
-
-
-import requests
+from pymongo import MongoClient
 import pandas as pd
+import os
 
-# Send GET request to API endpoint
-url = "https://nodeumcu-clientserver.onrender.com/api/data"
-response = requests.get(url)
+def getData():
+    # Set up MongoDB connection
+    client = MongoClient('mongodb+srv://eldhopaulose0485:xyzel_025@cluster0.4sjqm.mongodb.net/NodeMcu?retryWrites=true&w=majority')
+    db = client['NodeMcu']
+    sensor_collection = db['sensors']
 
-# Convert JSON response to DataFrame
-data = response.json()
-df = pd.DataFrame(data)
+    # Define the filename for the CSV file
+    filename = 'sensor_data.csv'
 
-# Append DataFrame to CSV file
-df.to_csv("data.csv", mode='a', header=False, index=False)
+    # Check if the file exists
+    file_exists = os.path.isfile(filename)
+
+    # Fetch the sensor data
+    try:
+        # Find all documents in the collection
+        sensor_data = list(sensor_collection.find())
+
+        print('Found the following documents:')
+        print(sensor_data)
+
+        # Convert the data to a pandas DataFrame
+        df = pd.DataFrame(sensor_data)
+
+        df.to_csv(filename, mode='a', header=not file_exists, index=False)
+
+    except Exception as e:
+        print('Error fetching and saving sensor data:', e)
